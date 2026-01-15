@@ -1,4 +1,4 @@
-# security Validator
+# Security Validator
 
 A web application to validate security vulnerabilities across multiple domains, specifically checking SSL certificate expiration and cookie security configurations.
 
