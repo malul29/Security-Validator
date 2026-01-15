@@ -3,7 +3,7 @@ A web application to validate security vulnerabilities across multiple domains, 
 
 ## UI Preview
 
-![Security Validator UI](./screenshots/ui-preview.png)
+![Security Validator UI](./screenshots/dark_mode_layout_1768461705302.png)
 
 ## Features
 
