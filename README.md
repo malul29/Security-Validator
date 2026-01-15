@@ -34,7 +34,7 @@ A web application to validate security vulnerabilities across multiple domains, 
 
 1. **Clone or navigate to the project directory:**
    ```bash
-   cd d:\EHE
+   cd Security-Validator
    ```
 
 2. **Install dependencies:**
