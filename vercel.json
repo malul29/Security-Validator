@@ -4,16 +4,40 @@
         {
             "src": "server.js",
             "use": "@vercel/node"
+        },
+        {
+            "src": "style.css",
+            "use": "@vercel/static"
+        },
+        {
+            "src": "app.js",
+            "use": "@vercel/static"
+        },
+        {
+            "src": "index.html",
+            "use": "@vercel/static"
+        },
+        {
+            "src": "logo.png",
+            "use": "@vercel/static"
         }
     ],
     "routes": [
         {
-            "src": "/api/(.*)",
-            "dest": "/server.js"
+            "src": "/style.css",
+            "dest": "/style.css"
         },
         {
-            "src": "/(.*\\.(css|js|png|jpg|jpeg|svg|ico|gif|webp))",
-            "dest": "/$1"
+            "src": "/app.js",
+            "dest": "/app.js"
+        },
+        {
+            "src": "/logo.png",
+            "dest": "/logo.png"
+        },
+        {
+            "src": "/api/(.*)",
+            "dest": "/server.js"
         },
         {
             "src": "/(.*)",
