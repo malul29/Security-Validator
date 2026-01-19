@@ -18,11 +18,42 @@ async function checkCookies(domain) {
             timeout: 10000,
             validateStatus: () => true, // Accept any status code
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             }
         });
 
-        const cookieHeaders = response.headers['set-cookie'] || [];
+        // Get all Set-Cookie headers (case-insensitive)
+        let cookieHeaders = [];
+
+        // Check different variations of the header name
+        const headerVariations = ['set-cookie', 'Set-Cookie', 'SET-COOKIE'];
+        for (const variation of headerVariations) {
+            if (response.headers[variation]) {
+                const cookies = response.headers[variation];
+                if (Array.isArray(cookies)) {
+                    cookieHeaders = cookieHeaders.concat(cookies);
+                } else {
+                    cookieHeaders.push(cookies);
+                }
+            }
+        }
+
+        // Also check raw headers if available
+        if (response.headers && typeof response.headers === 'object') {
+            Object.keys(response.headers).forEach(key => {
+                if (key.toLowerCase() === 'set-cookie') {
+                    const value = response.headers[key];
+                    if (Array.isArray(value)) {
+                        cookieHeaders = cookieHeaders.concat(value);
+                    } else if (typeof value === 'string' && !cookieHeaders.includes(value)) {
+                        cookieHeaders.push(value);
+                    }
+                }
+            });
+        }
+
+        // Remove duplicates
+        cookieHeaders = [...new Set(cookieHeaders)];
 
         if (cookieHeaders.length === 0) {
             return {
@@ -44,6 +75,7 @@ async function checkCookies(domain) {
             const [nameValue] = cookieParts;
             const [name] = nameValue.split('=');
 
+            // Check flags (case-insensitive)
             const hasSecure = cookieParts.some(part => part.toLowerCase() === 'secure');
             const hasHttpOnly = cookieParts.some(part => part.toLowerCase() === 'httponly');
             const hasSameSite = cookieParts.some(part => part.toLowerCase().startsWith('samesite'));
