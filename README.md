@@ -1,10 +1,6 @@
 # Security Validator
 A web application to validate security vulnerabilities across multiple domains, specifically checking SSL certificate expiration and cookie security configurations.
 
-## UI Preview
-
-![Security Validator UI](./screenshots/dark_mode_layout_1768461705302.png)
-
 ## Features
 
 - ✅ **SSL Certificate Validation**
