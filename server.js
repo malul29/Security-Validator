@@ -19,7 +19,16 @@ app.use(express.static(path.join(__dirname)));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', message: 'Acunetix Vulnerability Validator API is running' });
+    res.json({
+        status: 'ok',
+        message: 'Acunetix Vulnerability Validator API is running',
+        version: '1.1.0',
+        validators: {
+            ssl: 'enabled',
+            cookies: 'enabled - case-insensitive detection',
+            hsts: 'enabled - case-insensitive detection'
+        }
+    });
 });
 
 // Check SSL certificate for a single domain
