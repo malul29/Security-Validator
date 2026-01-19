@@ -210,6 +210,7 @@ function renderResults() {
 
   exportJsonBtn.style.display = 'inline-flex';
   updateStats();
+  initializeToggleListeners();
 }
 
 // Render SSL section
@@ -218,41 +219,46 @@ function renderSSLSection(ssl) {
 
   return `
     <div class="check-section">
-      <div class="check-title">
-        🔒 SSL Certificate
-        <span class="status-badge ${severityClass}">${ssl.status || 'Unknown'}</span>
+      <div class="check-title" onclick="toggleSection(this)">
+        <div class="check-title-content">
+          🔒 SSL Certificate
+          <span class="status-badge ${severityClass}">${ssl.status || 'Unknown'}</span>
+        </div>
+        <span class="check-toggle">▼</span>
       </div>
-      ${ssl.success ? `
-        <div class="check-details">
-          <div class="detail-row">
-            <span class="detail-label">Days Remaining</span>
-            <span class="detail-value ${ssl.daysRemaining < 30 ? 'text-warning' : ''}">${ssl.daysRemaining} days</span>
+      <div class="check-details-wrapper">
+        ${ssl.success ? `
+          <div class="check-details">
+            <div class="detail-row">
+              <span class="detail-label">Days Remaining</span>
+              <span class="detail-value ${ssl.daysRemaining < 30 ? 'text-warning' : ''}">${ssl.daysRemaining} days</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Valid From</span>
+              <span class="detail-value">${new Date(ssl.validFrom).toLocaleDateString()}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Valid To</span>
+              <span class="detail-value">${new Date(ssl.validTo).toLocaleDateString()}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Issuer</span>
+              <span class="detail-value">${escapeHtml(ssl.issuer || 'N/A')}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Message</span>
+              <span class="detail-value">${escapeHtml(ssl.message)}</span>
+            </div>
           </div>
-          <div class="detail-row">
-            <span class="detail-label">Valid From</span>
-            <span class="detail-value">${new Date(ssl.validFrom).toLocaleDateString()}</span>
+        ` : `
+          <div class="check-details">
+            <div class="detail-row">
+              <span class="detail-label">Error</span>
+              <span class="detail-value">${escapeHtml(ssl.message || ssl.error || 'Unknown error')}</span>
+            </div>
           </div>
-          <div class="detail-row">
-            <span class="detail-label">Valid To</span>
-            <span class="detail-value">${new Date(ssl.validTo).toLocaleDateString()}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Issuer</span>
-            <span class="detail-value">${escapeHtml(ssl.issuer || 'N/A')}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Message</span>
-            <span class="detail-value">${escapeHtml(ssl.message)}</span>
-          </div>
-        </div>
-      ` : `
-        <div class="check-details">
-          <div class="detail-row">
-            <span class="detail-label">Error</span>
-            <span class="detail-value">${escapeHtml(ssl.message || ssl.error || 'Unknown error')}</span>
-          </div>
-        </div>
-      `}
+        `}
+      </div>
     </div>
   `;
 }
@@ -263,45 +269,50 @@ function renderCookieSection(cookies) {
 
   return `
     <div class="check-section">
-      <div class="check-title">
-        🍪 Cookie Security
-        <span class="status-badge ${severityClass}">${cookies.status || 'Unknown'}</span>
+      <div class="check-title" onclick="toggleSection(this)">
+        <div class="check-title-content">
+          🍪 Cookie Security
+          <span class="status-badge ${severityClass}">${cookies.status || 'Unknown'}</span>
+        </div>
+        <span class="check-toggle">▼</span>
       </div>
-      ${cookies.success ? `
-        <div class="check-details">
-          <div class="detail-row">
-            <span class="detail-label">Total Cookies</span>
-            <span class="detail-value">${cookies.cookieCount}</span>
+      <div class="check-details-wrapper">
+        ${cookies.success ? `
+          <div class="check-details">
+            <div class="detail-row">
+              <span class="detail-label">Total Cookies</span>
+              <span class="detail-value">${cookies.cookieCount}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Issues Found</span>
+              <span class="detail-value">${cookies.issueCount || 0}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Message</span>
+              <span class="detail-value">${escapeHtml(cookies.message)}</span>
+            </div>
           </div>
-          <div class="detail-row">
-            <span class="detail-label">Issues Found</span>
-            <span class="detail-value">${cookies.issueCount || 0}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Message</span>
-            <span class="detail-value">${escapeHtml(cookies.message)}</span>
-          </div>
-        </div>
-        ${cookies.issues && cookies.issues.length > 0 ? `
-          <div class="issue-list">
-            ${cookies.issues.map(issue => `
-              <div class="issue-item">
-                <div class="issue-cookie">🔴 ${escapeHtml(issue.name)}</div>
-                <div class="issue-problems">
-                  ${issue.issues.map(i => `<span>${escapeHtml(i)}</span>`).join('')}
+          ${cookies.issues && cookies.issues.length > 0 ? `
+            <div class="issue-list">
+              ${cookies.issues.map(issue => `
+                <div class="issue-item">
+                  <div class="issue-cookie">🔴 ${escapeHtml(issue.name)}</div>
+                  <div class="issue-problems">
+                    ${issue.issues.map(i => `<span>${escapeHtml(i)}</span>`).join('')}
+                  </div>
                 </div>
-              </div>
-            `).join('')}
+              `).join('')}
+            </div>
+          ` : ''}
+        ` : `
+          <div class="check-details">
+            <div class="detail-row">
+              <span class="detail-label">Error</span>
+              <span class="detail-value">${escapeHtml(cookies.message || cookies.error || 'Unknown error')}</span>
+            </div>
           </div>
-        ` : ''}
-      ` : `
-        <div class="check-details">
-          <div class="detail-row">
-            <span class="detail-label">Error</span>
-            <span class="detail-value">${escapeHtml(cookies.message || cookies.error || 'Unknown error')}</span>
-          </div>
-        </div>
-      `}
+        `}
+      </div>
     </div>
   `;
 }
@@ -312,52 +323,57 @@ function renderHSTSSection(hsts) {
 
   return `
     <div class="check-section">
-      <div class="check-title">
-        🛡️ HSTS Policy
-        <span class="status-badge ${severityClass}">${hsts.status || 'Unknown'}</span>
+      <div class="check-title" onclick="toggleSection(this)">
+        <div class="check-title-content">
+          🛡️ HSTS Policy
+          <span class="status-badge ${severityClass}">${hsts.status || 'Unknown'}</span>
+        </div>
+        <span class="check-toggle">▼</span>
       </div>
-      ${hsts.success ? `
-        <div class="check-details">
-          <div class="detail-row">
-            <span class="detail-label">Enabled</span>
-            <span class="detail-value">${hsts.enabled ? 'Yes' : 'No'}</span>
+      <div class="check-details-wrapper">
+        ${hsts.success ? `
+          <div class="check-details">
+            <div class="detail-row">
+              <span class="detail-label">Enabled</span>
+              <span class="detail-value">${hsts.enabled ? 'Yes' : 'No'}</span>
+            </div>
+            ${hsts.details.maxAge !== null ? `
+              <div class="detail-row">
+                <span class="detail-label">Max Age</span>
+                <span class="detail-value">${hsts.details.maxAgeDays} days</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Include Subdomains</span>
+                <span class="detail-value">${hsts.details.includeSubDomains ? 'Yes' : 'No'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Preload</span>
+                <span class="detail-value">${hsts.details.preload ? 'Yes' : 'No'}</span>
+              </div>
+            ` : ''}
+            <div class="detail-row">
+              <span class="detail-label">Message</span>
+              <span class="detail-value">${escapeHtml(hsts.message)}</span>
+            </div>
           </div>
-          ${hsts.details.maxAge !== null ? `
-            <div class="detail-row">
-              <span class="detail-label">Max Age</span>
-              <span class="detail-value">${hsts.details.maxAgeDays} days</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Include Subdomains</span>
-              <span class="detail-value">${hsts.details.includeSubDomains ? 'Yes' : 'No'}</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Preload</span>
-              <span class="detail-value">${hsts.details.preload ? 'Yes' : 'No'}</span>
+          ${hsts.details.issues && hsts.details.issues.length > 0 ? `
+            <div class="issue-list">
+              ${hsts.details.issues.map(issue => `
+                <div class="issue-item">
+                  <div class="issue-cookie">⚠️ ${escapeHtml(issue)}</div>
+                </div>
+              `).join('')}
             </div>
           ` : ''}
-          <div class="detail-row">
-            <span class="detail-label">Message</span>
-            <span class="detail-value">${escapeHtml(hsts.message)}</span>
+        ` : `
+          <div class="check-details">
+            <div class="detail-row">
+              <span class="detail-label">Error</span>
+              <span class="detail-value">${escapeHtml(hsts.message || hsts.error || 'Unknown error')}</span>
+            </div>
           </div>
-        </div>
-        ${hsts.details.issues && hsts.details.issues.length > 0 ? `
-          <div class="issue-list">
-            ${hsts.details.issues.map(issue => `
-              <div class="issue-item">
-                <div class="issue-cookie">⚠️ ${escapeHtml(issue)}</div>
-              </div>
-            `).join('')}
-          </div>
-        ` : ''}
-      ` : `
-        <div class="check-details">
-          <div class="detail-row">
-            <span class="detail-label">Error</span>
-            <span class="detail-value">${escapeHtml(hsts.message || hsts.error || 'Unknown error')}</span>
-          </div>
-        </div>
-      `}
+        `}
+      </div>
     </div>
   `;
 }
@@ -452,3 +468,15 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+// Toggle section collapse/expand
+function toggleSection(titleElement) {
+  const section = titleElement.closest('.check-section');
+  section.classList.toggle('collapsed');
+}
+
+// Initialize toggle listeners (called after rendering results)
+function initializeToggleListeners() {
+  // All toggle functionality is handled via onclick in HTML
+  // This function exists for future enhancements if needed
+}
