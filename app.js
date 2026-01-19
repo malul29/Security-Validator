@@ -145,7 +145,7 @@ async function validateDomains() {
   progressFill.style.width = '0%';
 
   try {
-    const response = await fetch('http://localhost:3000/api/validate', {
+    const response = await fetch('/api/validate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
