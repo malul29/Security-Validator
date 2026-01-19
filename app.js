@@ -195,10 +195,15 @@ function renderResults() {
   }
 
   resultsGrid.innerHTML = state.results.map(result => `
-    <div class="result-card">
-      <div class="result-header">
-        <div class="result-domain">🌐 ${escapeHtml(result.domain)}</div>
-        <div class="result-timestamp">Checked: ${new Date(result.timestamp).toLocaleString()}</div>
+    <div class="result-card collapsed">
+      <div class="result-header" onclick="toggleDomain(this)">
+        <div class="result-header-content">
+          <div class="result-domain">🌐 ${escapeHtml(result.domain)}</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div class="result-timestamp">Checked: ${new Date(result.timestamp).toLocaleString()}</div>
+          <span class="result-toggle">▼</span>
+        </div>
       </div>
       <div class="result-body">
         ${renderSSLSection(result.ssl)}
@@ -218,7 +223,7 @@ function renderSSLSection(ssl) {
   const severityClass = ssl.severity || 'error';
 
   return `
-    <div class="check-section">
+    <div class="check-section collapsed">
       <div class="check-title" onclick="toggleSection(this)">
         <div class="check-title-content">
           🔒 SSL Certificate
@@ -268,7 +273,7 @@ function renderCookieSection(cookies) {
   const severityClass = cookies.severity || 'error';
 
   return `
-    <div class="check-section">
+    <div class="check-section collapsed">
       <div class="check-title" onclick="toggleSection(this)">
         <div class="check-title-content">
           🍪 Cookie Security
@@ -322,7 +327,7 @@ function renderHSTSSection(hsts) {
   const severityClass = hsts.severity || 'error';
 
   return `
-    <div class="check-section">
+    <div class="check-section collapsed">
       <div class="check-title" onclick="toggleSection(this)">
         <div class="check-title-content">
           🛡️ HSTS Policy
@@ -473,6 +478,12 @@ document.head.appendChild(style);
 function toggleSection(titleElement) {
   const section = titleElement.closest('.check-section');
   section.classList.toggle('collapsed');
+}
+
+// Toggle domain card collapse/expand
+function toggleDomain(headerElement) {
+  const card = headerElement.closest('.result-card');
+  card.classList.toggle('collapsed');
 }
 
 // Initialize toggle listeners (called after rendering results)

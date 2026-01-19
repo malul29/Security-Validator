@@ -507,6 +507,29 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition-fast);
+}
+
+.result-header:hover {
+  background: var(--bg-secondary);
+}
+
+.result-header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.result-toggle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  transition: transform var(--transition-normal);
+}
+
+.result-card.collapsed .result-toggle {
+  transform: rotate(-90deg);
 }
 
 .result-domain {
@@ -530,6 +553,14 @@ header {
   display: flex;
   flex-direction: column;
   gap: 0;
+  overflow: hidden;
+  transition: max-height var(--transition-normal) ease;
+  max-height: 3000px;
+}
+
+.result-card.collapsed .result-body {
+  max-height: 0;
+  border-top: none;
 }
 
 .check-section {
